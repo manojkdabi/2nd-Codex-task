@@ -6422,54 +6422,93 @@
     <div id="mod-stv-direct" class="module-view">
       <div class="module-header">
         <div class="toolbar">
-          <button class="btn btn-teal" onclick="document.getElementById('stvDirectModuleImport').click()">Import CSV</button>
-          <button class="btn btn-outline" onclick="refreshSTVDirect()">Refresh</button>
-          <button class="btn btn-indigo" onclick="exportSTVDirectBulkPdf()">Bulk Export</button>
-          <input type="file" id="stvDirectModuleImport" accept=".csv" style="display:none;" onchange="client_ImportCSV_STVDirect(this)">
-          <span id="stv-direct-status" style="font-size:0.85rem; color:#64748b;"></span>
-        </div>
+  <button class="btn btn-teal"
+          onclick="document.getElementById('stvDirectModuleImport').click()">
+    Import CSV
+  </button>
+
+  <button class="btn btn-outline"
+          onclick="refreshSTVDirect()">
+    Refresh
+  </button>
+
+  <!-- ✅ Single PDF (exports currently selected Test_ID) -->
+  <button class="btn btn-indigo"
+          id="stvDirectPdfBtn"
+          type="button">
+    PDF
+  </button>
+
+  <!-- ✅ Bulk Export (exports selected rows) -->
+  <button class="btn btn-indigo"
+          id="stvDirectBulkExportBtn"
+          type="button">
+    Bulk Export
+  </button>
+
+  <input type="file"
+         id="stvDirectModuleImport"
+         accept=".csv"
+         style="display:none;"
+         onchange="client_ImportCSV_STVDirect(this)">
+
+  <span id="stv-direct-status" style="font-size:0.85rem; color:#64748b;"></span>
+</div>
+
       </div>
 
-      <div class="split-container">
-        <div class="panel-upper" id="stv-direct-upper">
-          <div class="panel-label">STV DIRECT RESULTS (FINAL VALUES)</div>
-          <table id="tbl-stv-direct" class="selectable-table">
-            <thead>
-              <tr>
-                <th>
-                  <input type="checkbox" id="stv-direct-select-all" onclick="toggleSTVDirectSelectAll(this)">
-                </th>
-                <th>Report</th>
-                <th>Farmer</th>
-                <th>Farm ID</th>
-                <th>Crop</th>
-                <th>Test ID</th>
-                <th>Device ID</th>
-                <th class="col-date">Test Date-Time</th>
-                <th class="col-date">Report Date-time</th>
-                <th>pH (-)</th>
-                <th>EC (dS/m)</th>
-                <th>Org Carbon (%)</th>
-                <th>Nitrogen (kg/ha)</th>
-                <th>Phosphorus (kg/ha)</th>
-                <th>Potassium (kg/ha)</th>
-                <th>Sulphur (mg/kg)</th>
-                <th>Zinc (mg/kg)</th>
-                <th>Copper (mg/kg)</th>
-                <th>Iron (mg/kg)</th>
-                <th>Manganese (mg/kg)</th>
-                <th>Boron (mg/kg)</th>
-              </tr>
-            </thead>
-            <tbody id="body-stv-direct">
-              <tr>
-                <td colspan="21" style="padding:20px;text-align:center;">Import a CSV to view STV Direct records.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+<div class="split-container">
+  <div class="panel-upper" id="stv-direct-upper">
+    <div class="panel-label">STV DIRECT RESULTS (FINAL VALUES)</div>
+
+    <table id="tbl-stv-direct" class="selectable-table">
+      <thead>
+        <tr>
+          <th>
+            <input
+              type="checkbox"
+              id="stv-direct-select-all"
+              onclick="toggleSTVDirectSelectAll(this)"
+            >
+          </th>
+
+          <!-- Report column: PDF button will be injected here per row -->
+          <th>Report</th>
+
+          <th>Farmer</th>
+          <th>Farm ID</th>
+          <th>Crop</th>
+          <th>Test ID</th>
+          <th>Device ID</th>
+          <th class="col-date">Test Date-Time</th>
+          <th class="col-date">Report Date-time</th>
+          <th>pH (-)</th>
+          <th>EC (dS/m)</th>
+          <th>Org Carbon (%)</th>
+          <th>Nitrogen (kg/ha)</th>
+          <th>Phosphorus (kg/ha)</th>
+          <th>Potassium (kg/ha)</th>
+          <th>Sulphur (mg/kg)</th>
+          <th>Zinc (mg/kg)</th>
+          <th>Copper (mg/kg)</th>
+          <th>Iron (mg/kg)</th>
+          <th>Manganese (mg/kg)</th>
+          <th>Boron (mg/kg)</th>
+        </tr>
+      </thead>
+
+      <tbody id="body-stv-direct">
+        <tr id="stv-direct-empty-row">
+          <td colspan="21" style="padding:20px;text-align:center;">
+            Import a CSV to view STV Direct records.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
 
     <!-- Database Module -->
     <!-- ==================== Database Module ==================== -->
@@ -23314,39 +23353,50 @@ function renderSTVDirectTable(rows) {
   updateSTVDirectSelectionState();
 }
 
-function toggleSTVDirectRowSelection(index, checkbox) {
-  if (!checkbox) return;
-  if (checkbox.checked) {
-    stvDirectSelected.add(index);
-  } else {
-    stvDirectSelected.delete(index);
-  }
+// Keep selected Test_IDs here (stable even if rows reorder)
+if (!window.stvDirectSelectedTestIds) window.stvDirectSelectedTestIds = new Set();
+
+function toggleSTVDirectRowSelection(testId, checkboxEl) {
+  testId = String(testId || '').trim();
+  if (!testId) return;
+
+  const checked = !!(checkboxEl && checkboxEl.checked);
+  if (checked) window.stvDirectSelectedTestIds.add(testId);
+  else window.stvDirectSelectedTestIds.delete(testId);
+
   updateSTVDirectSelectionState();
 }
 
-function toggleSTVDirectSelectAll(checkbox) {
-  if (!checkbox) return;
-  stvDirectSelected = new Set();
-  if (checkbox.checked) {
-    stvDirectRows.forEach((_, idx) => stvDirectSelected.add(idx));
-  }
-  document.querySelectorAll('.stv-direct-row-check').forEach(input => {
-    input.checked = checkbox.checked;
+function toggleSTVDirectSelectAll(master) {
+  const checked = !!master.checked;
+  document.querySelectorAll('#body-stv-direct .stvDirectRowSelect').forEach(cb => {
+    cb.checked = checked;
+    const tid = (cb.getAttribute('data-testid') || '').trim();
+    if (tid) {
+      if (checked) window.stvDirectSelectedTestIds.add(tid);
+      else window.stvDirectSelectedTestIds.delete(tid);
+    }
   });
   updateSTVDirectSelectionState();
 }
 
 function updateSTVDirectSelectionState() {
-  const selectAll = document.getElementById('stv-direct-select-all');
-  const total = stvDirectRows.length;
-  const selectedCount = stvDirectSelected.size;
-  if (selectAll) {
-    selectAll.checked = total > 0 && selectedCount === total;
-    selectAll.indeterminate = selectedCount > 0 && selectedCount < total;
+  // Optional: show count in your status span
+  const status = document.getElementById('stv-direct-status');
+  if (status) {
+    const n = window.stvDirectSelectedTestIds ? window.stvDirectSelectedTestIds.size : 0;
+    status.textContent = n ? `${n} selected` : '';
   }
-  const bulkBtn = document.querySelector('[onclick="exportSTVDirectBulkPdf()"]');
-  if (bulkBtn) bulkBtn.disabled = selectedCount === 0;
+
+  // keep select-all checkbox in sync (optional)
+  const allBox = document.getElementById('stv-direct-select-all');
+  if (allBox) {
+    const boxes = Array.from(document.querySelectorAll('#body-stv-direct .stvDirectRowSelect'));
+    const allChecked = boxes.length > 0 && boxes.every(b => b.checked);
+    allBox.checked = allChecked;
+  }
 }
+
 
 function getSelectedSTVDirectRows() {
   return Array.from(stvDirectSelected)
@@ -23451,21 +23501,43 @@ function fetchStvDirectDosePlan(row) {
 }
 
 async function exportSTVDirectPdfReport(index) {
-  nmLogDebug('STV Direct export PDF', { index });
-  if (!ensureSTVDirectExportLibs()) return;
-  const row = stvDirectRows[index];
+  nmLogDebug('STV Direct export PDF (server template)', { index });
+
+  const row = (window.stvDirectRows && window.stvDirectRows[index]) ? window.stvDirectRows[index] : (typeof stvDirectRows !== 'undefined' ? stvDirectRows[index] : null);
   if (!row) {
     alert('Report row not found.');
     return;
   }
+
+  const testId = String(row.Test_ID || '').trim();
+  if (!testId) {
+    alert('Missing Test_ID in selected row.');
+    return;
+  }
+
   const statusEl = document.getElementById('stv-direct-status');
-  if (statusEl) statusEl.textContent = 'Generating PDF report...';
+  if (statusEl) statusEl.textContent = `Generating PDF for Test_ID ${testId}...`;
+
   try {
-    const dosePlan = await fetchStvDirectDosePlan(row);
-    const reportData = mapSTVDirectReportRow(row, dosePlan);
-    const blob = await generateStvDirectPdfBlob(reportData);
-    const tid = row.Test_ID ? String(row.Test_ID).replace(/\s+/g, '_') : 'STV_Direct';
-    downloadBlobFile(`${tid}_STV_Direct_Report.pdf`, blob);
+    const res = await new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .generateStvDirectPdf(testId);
+    });
+
+    if (!res || !res.ok || !res.pdf) throw new Error(res?.error || 'PDF export failed');
+
+    // Download base64 PDF
+    const byteChars = atob(res.pdf);
+    const bytes = new Uint8Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+
+    const blob = new Blob([bytes], { type: res.mimeType || 'application/pdf' });
+    const fileName = res.fileName || `${testId}_STV_Direct_Report.pdf`;
+
+    downloadBlobFile(fileName, blob);
+
     if (statusEl) statusEl.textContent = 'PDF report ready.';
   } catch (err) {
     console.error('STV Direct PDF export failed:', err);
@@ -23474,6 +23546,7 @@ async function exportSTVDirectPdfReport(index) {
     if (statusEl) statusEl.textContent = 'PDF export failed.';
   }
 }
+
 
 function formatSTVDirectRowForExport(row) {
   return [
@@ -23501,37 +23574,155 @@ function formatSTVDirectRowForExport(row) {
 }
 
 async function exportSTVDirectBulkPdf() {
-  nmLogDebug('STV Direct export bulk PDF');
-  if (!ensureSTVDirectExportLibs()) return;
+  nmLogDebug('STV Direct export bulk PDF (server template)');
+
   const selected = getSelectedSTVDirectRows();
   if (!selected.length) {
     alert('Select at least one STV Direct row to export.');
     return;
   }
+
+  // Extract Test_IDs
+  const testIds = selected
+    .map(x => String((x && x.row && x.row.Test_ID) ? x.row.Test_ID : '').trim())
+    .filter(Boolean);
+
+  if (!testIds.length) {
+    alert('Selected rows have no Test_ID.');
+    return;
+  }
+
   const statusEl = document.getElementById('stv-direct-status');
-  if (statusEl) statusEl.textContent = `Generating ${selected.length} PDF report(s)...`;
+  if (statusEl) statusEl.textContent = `Generating ${testIds.length} PDF(s) as ZIP...`;
 
   try {
-    const zip = new JSZip();
-    for (let i = 0; i < selected.length; i++) {
-      const { row } = selected[i];
-      const dosePlan = await fetchStvDirectDosePlan(row);
-      const reportData = mapSTVDirectReportRow(row, dosePlan);
-      const blob = await generateStvDirectPdfBlob(reportData);
-      const tid = row.Test_ID ? String(row.Test_ID).replace(/\s+/g, '_') : `STV_Direct_${i + 1}`;
-      zip.file(`${tid}_STV_Direct_Report.pdf`, blob);
-      if (statusEl) statusEl.textContent = `Generated ${i + 1}/${selected.length} PDFs...`;
-    }
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    const zipName = `STV_Direct_Reports_${new Date().toISOString().split('T')[0]}.zip`;
+    const res = await new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .generateStvDirectBulkZip(testIds);
+    });
+
+    if (!res || !res.ok || !res.zip) throw new Error(res?.error || 'Bulk export failed');
+
+    // Download base64 ZIP
+    const byteChars = atob(res.zip);
+    const bytes = new Uint8Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+
+    const zipBlob = new Blob([bytes], { type: res.mimeType || 'application/zip' });
+    const zipName = res.fileName || `STV_Direct_Reports_${new Date().toISOString().split('T')[0]}.zip`;
+
     downloadBlobFile(zipName, zipBlob);
+
     if (statusEl) statusEl.textContent = 'Bulk export ready.';
   } catch (err) {
     console.error('STV Direct bulk export failed:', err);
-    alert('Failed to generate bulk PDF export.');
+    const message = err && err.message ? `\n\n${err.message}` : '';
+    alert(`Failed to generate bulk PDF export.${message}`);
     if (statusEl) statusEl.textContent = 'Bulk export failed.';
   }
 }
+
+function downloadBase64File(base64, filename, mimeType) {
+  const byteChars = atob(base64);
+  const byteNumbers = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+
+  const blob = new Blob([new Uint8Array(byteNumbers)], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+function stvExportSinglePdf(testId) {
+  if (!testId) return;
+
+  setStvExportStatus(`Exporting PDF for Test_ID ${testId}...`);
+
+  google.script.run
+    .withSuccessHandler(function (res) {
+      try {
+        if (!res || !res.ok) throw new Error(res?.error || 'Export failed');
+        downloadBase64File(res.pdf, res.fileName || `STVDirect_${testId}.pdf`, res.mimeType || 'application/pdf');
+        setStvExportStatus(`Done: ${res.fileName}`);
+      } catch (e) {
+        console.error(e);
+        setStvExportStatus(`Error: ${e.message}`);
+      }
+    })
+    .withFailureHandler(function (err) {
+      console.error(err);
+      setStvExportStatus(`Error: ${err.message || err}`);
+    })
+    .generateStvDirectPdf(testId);
+}
+
+function stvExportBulkSelected() {
+  const checks = Array.from(document.querySelectorAll('.stv-row-select:checked'));
+  const testIds = checks.map(cb => cb.getAttribute('data-testid')).filter(Boolean);
+
+  if (testIds.length === 0) {
+    setStvExportStatus('Select at least 1 row to export.');
+    return;
+  }
+
+  setStvExportStatus(`Bulk exporting ${testIds.length} PDFs...`);
+
+  google.script.run
+    .withSuccessHandler(function (res) {
+      try {
+        if (!res || !res.ok) throw new Error(res?.error || 'Bulk export failed');
+        downloadBase64File(res.zip, res.fileName || 'STVDirect_Bulk.zip', res.mimeType || 'application/zip');
+        setStvExportStatus(`Done: ${res.fileName} (${res.count} PDFs)`);
+      } catch (e) {
+        console.error(e);
+        setStvExportStatus(`Error: ${e.message}`);
+      }
+    })
+    .withFailureHandler(function (err) {
+      console.error(err);
+      setStvExportStatus(`Error: ${err.message || err}`);
+    })
+    .generateStvDirectBulkZip(testIds);
+}
+
+function initStvDirectExportUI() {
+  // Bulk export button
+  const bulkBtn = document.getElementById('stvBulkExportBtn');
+  if (bulkBtn) bulkBtn.onclick = stvExportBulkSelected;
+
+  // Select all checkbox
+  const selAll = document.getElementById('stvSelectAll');
+  if (selAll) {
+    selAll.onchange = function () {
+      const all = document.querySelectorAll('.stv-row-select');
+      all.forEach(cb => cb.checked = selAll.checked);
+    };
+  }
+
+  // Delegate row PDF clicks
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.stv-row-pdf');
+    if (!btn) return;
+    const testId = btn.getAttribute('data-testid');
+    stvExportSinglePdf(testId);
+  });
+}
+
+
+function setStvExportStatus(msg) {
+  const el = document.getElementById('stvExportStatus');
+  if (el) el.textContent = msg || '';
+}
+
 
 function exportSTVDirectSvgPrint() {
   nmLogDebug('STV Direct export SVG');
