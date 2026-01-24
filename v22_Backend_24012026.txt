@@ -7326,14 +7326,27 @@ function _stvGetAllRows_() {
   return [];
 }
 
+function _stvNormId_(v) {
+  return String(v ?? '')
+    .trim()
+    .replace(/\.0$/, ''); // handles "60001.0"
+}
+
 function _stvFindRowByTestId_(rows, testId) {
-  var tid = String(testId || '').trim();
+  var tid = _stvNormId_(testId);
   for (var i = 0; i < rows.length; i++) {
     var r = rows[i] || {};
-    if (String(r.Test_ID || '').trim() === tid) return r;
+
+    // check multiple possible keys
+    var raw =
+      r.Test_ID ?? r['Test_ID'] ?? r['Test ID'] ?? r.TestId ?? r.testId ?? r['test_id'] ??
+      r['TestID'] ?? r['TEST_ID'];
+
+    if (_stvNormId_(raw) === tid) return r;
   }
   return null;
 }
+
 
 /**
  * Normalize into keys expected by StvDirectExport.html:
