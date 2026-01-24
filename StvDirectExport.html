@@ -1,0 +1,136 @@
+<!--
+  This HTML template is used by the STV Direct PDF exporter.  It renders
+  a single STV Direct result using the same markup and styles as the
+  Insoil UI.  You can freely edit this file (add/remove elements,
+  adjust CSS, etc.) and any changes will appear in the exported PDF.
+  The template receives a single JavaScript object called `data` from
+  the server.  Each property corresponds to a value from the STV Direct
+  test (e.g. pH, EC, Avail_N, etc.).
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      /* Basic styling for the STV Direct report.  Feel free to customize. */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 24px;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+      .param-card {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+      .param-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .param-left {
+        display: flex;
+        align-items: center;
+      }
+      .badge {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #0088cc;
+        margin-right: 8px;
+      }
+      .pname {
+        font-weight: bold;
+        margin: 0;
+      }
+      .psub {
+        font-size: 0.8rem;
+        color: #666;
+        margin: 0;
+      }
+      .bar-wrap {
+        position: relative;
+        height: 10px;
+        width: 100%;
+        background-color: #eee;
+        margin-top: 8px;
+      }
+      .bar {
+        display: flex;
+        height: 100%;
+        width: 100%;
+      }
+      .seg.low {
+        background-color: #ffdddd;
+      }
+      .seg.mid {
+        background-color: #fff3cd;
+      }
+      .seg.high {
+        background-color: #d4edda;
+      }
+      .marker {
+        position: absolute;
+        top: -4px;
+        width: 0;
+        height: 18px;
+        border-left: 2px solid #333;
+      }
+      .zoneWords {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        margin-top: 4px;
+      }
+      /* Add more styles as needed to match your UI */
+    </style>
+  </head>
+  <body>
+    <h2>STV Direct Report</h2>
+    <!-- Render each parameter using the param-card style.  You can add
+         additional parameters or re-order them as needed.  Use
+         ${data.pH.value} to access values from the server. -->
+    <!-- Example: pH -->
+    <div class="param-card">
+      <div class="param-row">
+        <div class="param-left">
+          <div class="badge"></div>
+          <div>
+            <p class="pname">pH</p>
+            <p class="psub">Soil Reaction</p>
+          </div>
+        </div>
+        <div class="param-mid">
+          <div class="result-top">
+            <div class="result-value">${data.pH.value}</div>
+            <div class="result-chip">${data.pH.rating}</div>
+          </div>
+          <div class="bar-wrap">
+            <div class="bar">
+              <div class="seg low" style="width:${data.pH.cut1Percent}%"></div>
+              <div class="seg mid" style="width:${data.pH.cut2Percent - data.pH.cut1Percent}%"></div>
+              <div class="seg high" style="width:${100 - data.pH.cut2Percent}%"></div>
+            </div>
+            <div class="marker" style="left:${data.pH.markerPercent}%"></div>
+            <div class="zoneWords">
+              <span>Acidic</span>
+              <span>Neutral</span>
+              <span>Alkaline</span>
+            </div>
+          </div>
+        </div>
+        <div class="param-right">
+          <div class="rtop">What it means?</div>
+          <p class="rtext">pH affects nutrient absorption and promotes healthy root growth.</p>
+        </div>
+      </div>
+    </div>
+    <!-- You can duplicate the param-card block for other parameters (EC, OC, Avail_N, etc.).
+         To reflect UI changes, simply edit this template file; the PDF export
+         will automatically use the updated markup. -->
+  </body>
+</html>
