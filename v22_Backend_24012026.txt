@@ -7205,3 +7205,184 @@ function saveInventoryData(payload) {
 
   return { ok: true, msg: 'Inventory saved.' };
 }
+
+/**
+ * =========================
+ * STV DIRECT PDF EXPORT (Option B)
+ * =========================
+ * - Thresholds / cuts / bar lengths are controlled in StvDirectExport.html.
+ * - Backend ONLY passes STV values + metadata and converts template -> PDF.
+ * - Supports Single PDF and Bulk ZIP (multiple PDFs).
+ *
+ * Requires an existing function:
+ *   getSTVDirectData()
+ * returning rows as objects with headers:
+ *   ClientID, Test_ID, Device_ID, Farmer, Farm_ID, Crop, Date,
+ *   pH, EC, OC, Avail_N, Avail_P, Avail_K, Avail_S, Zn, Fe, Mn, Cu, B
+ */
+
+function generateStvDirectPdf(testId) {
+  testId = String(testId || '').trim();
+  if (!testId) throw new Error('generateStvDirectPdf: testId is required');
+
+  var rows = _stvGetAllRows_();
+  var rec = _stvFindRowByTestId_(rows, testId);
+  if (!rec) throw new Error('STV_Direct row not found for Test_ID: ' + testId);
+
+  var payload = _stvNormalizeRow_(rec);
+
+  var t = HtmlService.createTemplateFromFile('StvDirectExport');
+  t.data = { row: payload.row, meta: payload.meta };
+
+  var html = t.evaluate()
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .getContent();
+
+  var pdfBlob = Utilities.newBlob(html, MimeType.HTML).getAs(MimeType.PDF);
+  var fileName = 'STVDirect_' + payload.meta.testId + '.pdf';
+
+  return {
+    ok: true,
+    fileName: fileName,
+    mimeType: 'application/pdf',
+    pdf: Utilities.base64Encode(pdfBlob.getBytes())
+  };
+}
+
+/**
+ * Bulk export as ZIP of PDFs.
+ */
+function generateStvDirectBulkZip(testIds) {
+  if (!Array.isArray(testIds) || testIds.length === 0) {
+    throw new Error('generateStvDirectBulkZip: testIds[] is required');
+  }
+
+  var rows = _stvGetAllRows_();
+  var blobs = [];
+
+  for (var i = 0; i < testIds.length; i++) {
+    var testId = String(testIds[i] || '').trim();
+    if (!testId) continue;
+
+    var rec = _stvFindRowByTestId_(rows, testId);
+    if (!rec) continue;
+
+    var payload = _stvNormalizeRow_(rec);
+
+    var t = HtmlService.createTemplateFromFile('StvDirectExport');
+    t.data = { row: payload.row, meta: payload.meta };
+
+    var html = t.evaluate()
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .getContent();
+
+    var pdfBlob = Utilities.newBlob(html, MimeType.HTML).getAs(MimeType.PDF);
+    pdfBlob.setName('STVDirect_' + payload.meta.testId + '.pdf');
+    blobs.push(pdfBlob);
+  }
+
+  if (blobs.length === 0) {
+    throw new Error('generateStvDirectBulkZip: no PDFs created (check Test_IDs)');
+  }
+
+  var zipBlob = Utilities.zip(blobs, 'STVDirect_Bulk.zip');
+
+  return {
+    ok: true,
+    fileName: 'STVDirect_Bulk.zip',
+    mimeType: 'application/zip',
+    zip: Utilities.base64Encode(zipBlob.getBytes()),
+    count: blobs.length
+  };
+}
+
+function _stvGetAllRows_() {
+  if (typeof getSTVDirectData !== 'function') {
+    throw new Error('Missing getSTVDirectData() in backend.');
+  }
+
+  var res = getSTVDirectData();
+  if (!res) return [];
+
+  // If already array of objects
+  if (Array.isArray(res) && res.length && typeof res[0] === 'object' && !Array.isArray(res[0])) {
+    return res;
+  }
+
+  // If array of arrays with header row
+  if (Array.isArray(res) && res.length && Array.isArray(res[0])) {
+    var header = res[0];
+    var out = [];
+    for (var r = 1; r < res.length; r++) {
+      var obj = {};
+      for (var c = 0; c < header.length; c++) {
+        obj[String(header[c] || '').trim()] = res[r][c];
+      }
+      out.push(obj);
+    }
+    return out;
+  }
+
+  return [];
+}
+
+function _stvFindRowByTestId_(rows, testId) {
+  var tid = String(testId || '').trim();
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i] || {};
+    if (String(r.Test_ID || '').trim() === tid) return r;
+  }
+  return null;
+}
+
+/**
+ * Normalize into keys expected by StvDirectExport.html:
+ * pH, EC, OC, N, P, K, S, Cu, Zn, Fe, Mn, B
+ */
+function _stvNormalizeRow_(r) {
+  var row = {
+    pH: _pickNum_(r, ['pH']),
+    EC: _pickNum_(r, ['EC']),
+    OC: _pickNum_(r, ['OC']),
+
+    N:  _pickNum_(r, ['Avail_N']),
+    P:  _pickNum_(r, ['Avail_P']),
+    K:  _pickNum_(r, ['Avail_K']),
+    S:  _pickNum_(r, ['Avail_S']),
+
+    Zn: _pickNum_(r, ['Zn']),
+    Fe: _pickNum_(r, ['Fe']),
+    Mn: _pickNum_(r, ['Mn']),
+    Cu: _pickNum_(r, ['Cu']),
+    B:  _pickNum_(r, ['B'])
+  };
+
+  var meta = {
+    clientId: String(r.ClientID || '').trim(),
+    testId: String(r.Test_ID || '').trim(),
+    deviceId: String(r.Device_ID || '').trim(),
+    farmer: String(r.Farmer || '').trim(),
+    farmId: String(r.Farm_ID || '').trim(),
+    crop: String(r.Crop || '').trim(),
+    date: String(r.Date || '').trim()
+  };
+
+  return { row: row, meta: meta };
+}
+
+function _pickNum_(obj, keys) {
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i];
+    if (obj && Object.prototype.hasOwnProperty.call(obj, k)) {
+      var v = obj[k];
+      var n = Number(v);
+      if (isFinite(n)) return n;
+      if (typeof v === 'string') {
+        var cleaned = v.replace(/,/g, '').trim();
+        var n2 = Number(cleaned);
+        if (isFinite(n2)) return n2;
+      }
+    }
+  }
+  return null;
+}
