@@ -4190,28 +4190,135 @@
     }
 
     .ia-kpi {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 10px 12px;
-      box-shadow: var(--shadow-card);
+      --kpi-accent: #2563eb;
+      --kpi-accent-soft: rgba(37, 99, 235, 0.18);
+      --kpi-bg: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      position: relative;
+      background: var(--kpi-bg);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      border-left: 4px solid var(--kpi-accent);
+      border-radius: 12px;
+      padding: 14px 16px 12px;
+      padding-right: 38px;
+      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+      transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+    }
+
+    .ia-kpi::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, var(--kpi-accent-soft), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .ia-kpi:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 26px rgba(15, 23, 42, 0.14);
+    }
+
+    .ia-kpi > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ia-kpi[data-kpi="farms"] {
+      --kpi-accent: #2563eb;
+      --kpi-accent-soft: rgba(37, 99, 235, 0.2);
+      --kpi-bg: linear-gradient(135deg, #f8fbff 0%, #eef4ff 100%);
+    }
+    .ia-kpi[data-kpi="area"] {
+      --kpi-accent: #0ea5e9;
+      --kpi-accent-soft: rgba(14, 165, 233, 0.2);
+      --kpi-bg: linear-gradient(135deg, #f2fbff 0%, #e6f7ff 100%);
+    }
+    .ia-kpi[data-kpi="tests"] {
+      --kpi-accent: #10b981;
+      --kpi-accent-soft: rgba(16, 185, 129, 0.2);
+      --kpi-bg: linear-gradient(135deg, #f1fdf7 0%, #e8fbf1 100%);
+    }
+    .ia-kpi[data-kpi="repeat"] {
+      --kpi-accent: #f97316;
+      --kpi-accent-soft: rgba(249, 115, 22, 0.2);
+      --kpi-bg: linear-gradient(135deg, #fff5eb 0%, #ffeddc 100%);
+    }
+    .ia-kpi[data-kpi="fertilizer"] {
+      --kpi-accent: #8b5cf6;
+      --kpi-accent-soft: rgba(139, 92, 246, 0.2);
+      --kpi-bg: linear-gradient(135deg, #f7f5ff 0%, #eee9ff 100%);
+    }
+    .ia-kpi[data-kpi="yield"] {
+      --kpi-accent: #ec4899;
+      --kpi-accent-soft: rgba(236, 72, 153, 0.2);
+      --kpi-bg: linear-gradient(135deg, #fff1f7 0%, #ffe4f0 100%);
+    }
+    .ia-kpi[data-kpi="cov-states"] {
+      --kpi-accent: #0f766e;
+      --kpi-accent-soft: rgba(15, 118, 110, 0.2);
+      --kpi-bg: linear-gradient(135deg, #effaf8 0%, #e6f6f3 100%);
+    }
+    .ia-kpi[data-kpi="cov-districts"] {
+      --kpi-accent: #3b82f6;
+      --kpi-accent-soft: rgba(59, 130, 246, 0.2);
+      --kpi-bg: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
+    }
+    .ia-kpi[data-kpi="cov-farmers"] {
+      --kpi-accent: #16a34a;
+      --kpi-accent-soft: rgba(22, 163, 74, 0.2);
+      --kpi-bg: linear-gradient(135deg, #f1fdf5 0%, #e5f8ed 100%);
+    }
+    .ia-kpi[data-kpi="cov-area"] {
+      --kpi-accent: #d97706;
+      --kpi-accent-soft: rgba(217, 119, 6, 0.2);
+      --kpi-bg: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    }
+    .ia-kpi[data-kpi="cov-devices"] {
+      --kpi-accent: #7c3aed;
+      --kpi-accent-soft: rgba(124, 58, 237, 0.2);
+      --kpi-bg: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    }
+    .ia-kpi[data-kpi="cov-tests"] {
+      --kpi-accent: #be185d;
+      --kpi-accent-soft: rgba(190, 24, 93, 0.2);
+      --kpi-bg: linear-gradient(135deg, #fff1f5 0%, #ffe4e6 100%);
+    }
+
+    .ia-kpi-info {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.08);
+      color: #0f172a;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      z-index: 2;
     }
 
     .ia-kpi-title {
-      color: #64748b;
+      color: #475569;
       font-size: 12px;
       font-weight: 800;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
 
     .ia-kpi-val {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 900;
       color: #0f172a;
       margin-top: 4px;
     }
 
     .ia-kpi-sub {
-      color: #94a3b8;
+      color: #64748b;
       font-size: 12px;
       margin-top: 2px;
       font-weight: 600;
@@ -6588,7 +6695,6 @@
                 <th>Test ID</th>
                 <th>Device ID</th>
                 <th class="col-date">Test Date-Time</th>
-                <th class="col-date">Report Date-time</th>
                 <th>pH (-)</th>
                 <th>EC (dS/m)</th>
                 <th>Org Carbon (%)</th>
@@ -6605,7 +6711,7 @@
             </thead>
             <tbody id="body-stv-direct">
               <tr>
-                <td colspan="21" style="padding:20px;text-align:center;">Import a CSV to view STV Direct records.</td>
+                <td colspan="20" style="padding:20px;text-align:center;">Import a CSV to view STV Direct records.</td>
               </tr>
             </tbody>
           </table>
@@ -8900,32 +9006,38 @@
 
           <!-- SUMMARY CARDS -->
           <div class="ia-kpi-grid">
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="farms">
+              <span class="ia-info ia-kpi-info" data-info="kpi-farms">ⓘ</span>
               <div class="ia-kpi-title">Farms</div>
               <div class="ia-kpi-val" id="ia-kpi-farms">—</div>
               <div class="ia-kpi-sub">With any record</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="area">
+              <span class="ia-info ia-kpi-info" data-info="kpi-area">ⓘ</span>
               <div class="ia-kpi-title">Area (acres)</div>
               <div class="ia-kpi-val" id="ia-kpi-area">—</div>
               <div class="ia-kpi-sub">Filtered scope</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="tests">
+              <span class="ia-info ia-kpi-info" data-info="kpi-tests">ⓘ</span>
               <div class="ia-kpi-title">Soil Samples</div>
               <div class="ia-kpi-val" id="ia-kpi-tests">—</div>
               <div class="ia-kpi-sub">Baseline + follow-up</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="repeat">
+              <span class="ia-info ia-kpi-info" data-info="kpi-repeat">ⓘ</span>
               <div class="ia-kpi-title">Repeat Tests</div>
               <div class="ia-kpi-val" id="ia-kpi-repeat">—</div>
               <div class="ia-kpi-sub">% farms with ≥2 tests</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="fertilizer">
+              <span class="ia-info ia-kpi-info" data-info="kpi-fertilizer">ⓘ</span>
               <div class="ia-kpi-title">Fertilizer Data</div>
               <div class="ia-kpi-val" id="ia-kpi-fert">—</div>
               <div class="ia-kpi-sub">Farms with usage lines</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="yield">
+              <span class="ia-info ia-kpi-info" data-info="kpi-yield">ⓘ</span>
               <div class="ia-kpi-title">Yield Data</div>
               <div class="ia-kpi-val" id="ia-kpi-yield">—</div>
               <div class="ia-kpi-sub">Farms with yield entries</div>
@@ -9478,32 +9590,38 @@
         <div class="ia-tabpage" id="ia-tab-cov">
 
           <div class="ia-kpi-grid" style="margin-top:0;">
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="cov-states">
+              <span class="ia-info ia-kpi-info" data-info="kpi-coverage-states">ⓘ</span>
               <div class="ia-kpi-title">States</div>
               <div class="ia-kpi-val">—</div>
               <div class="ia-kpi-sub">Covered</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="cov-districts">
+              <span class="ia-info ia-kpi-info" data-info="kpi-coverage-districts">ⓘ</span>
               <div class="ia-kpi-title">Districts</div>
               <div class="ia-kpi-val">—</div>
               <div class="ia-kpi-sub">Covered</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="cov-farmers">
+              <span class="ia-info ia-kpi-info" data-info="kpi-coverage-farmers">ⓘ</span>
               <div class="ia-kpi-title">Farmers</div>
               <div class="ia-kpi-val">—</div>
               <div class="ia-kpi-sub">Unique</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="cov-area">
+              <span class="ia-info ia-kpi-info" data-info="kpi-coverage-area">ⓘ</span>
               <div class="ia-kpi-title">Area</div>
               <div class="ia-kpi-val">—</div>
               <div class="ia-kpi-sub">Acres</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="cov-devices">
+              <span class="ia-info ia-kpi-info" data-info="kpi-coverage-devices">ⓘ</span>
               <div class="ia-kpi-title">Devices</div>
               <div class="ia-kpi-val">—</div>
               <div class="ia-kpi-sub">Unique</div>
             </div>
-            <div class="ia-kpi">
+            <div class="ia-kpi" data-kpi="cov-tests">
+              <span class="ia-info ia-kpi-info" data-info="kpi-coverage-tests">ⓘ</span>
               <div class="ia-kpi-title">Tests</div>
               <div class="ia-kpi-val">—</div>
               <div class="ia-kpi-sub">Total</div>
@@ -16151,11 +16269,112 @@ function buildResultsReportId(testId, deviceId, testDate) {
   return `RPT${last5}${testPart}${datePart}`;
 }
 
-function downloadResultsReport(evt, testId, deviceId, crop, testDate) {
+function ensureResultsReportLibs() {
+  if (!window.html2canvas) {
+    alert('PDF export requires html2canvas to be loaded.');
+    return false;
+  }
+  if (!(window.jspdf && window.jspdf.jsPDF) && !window.jsPDF) {
+    alert('PDF export requires jsPDF to be loaded.');
+    return false;
+  }
+  return true;
+}
+
+function findResultsRowForReport(testId, deviceId, testDate) {
+  const testKey = String(testId || '').trim();
+  const deviceKey = String(deviceId || '').trim();
+  const dateKey = String(testDate || '').trim();
+  if (!testKey) return null;
+  const rows = rgbData || [];
+  const matches = (row) => {
+    const tId = String(row?.tid ?? row?.Test_ID ?? '').trim();
+    const dId = String(row?.did ?? row?.Device_ID ?? '').trim();
+    const dt = String(row?.time ?? row?.Test_date ?? row?.testDate ?? '').trim();
+    if (tId !== testKey) return false;
+    if (deviceKey && dId !== deviceKey) return false;
+    if (dateKey && dt !== dateKey) return false;
+    return true;
+  };
+  let found = rows.find(matches);
+  if (found) return found;
+  if (deviceKey) {
+    found = rows.find((row) => {
+      const tId = String(row?.tid ?? row?.Test_ID ?? '').trim();
+      const dId = String(row?.did ?? row?.Device_ID ?? '').trim();
+      return tId === testKey && dId === deviceKey;
+    });
+  }
+  if (found) return found;
+  return rows.find((row) => String(row?.tid ?? row?.Test_ID ?? '').trim() === testKey) || null;
+}
+
+function getResultsMetricValues(row) {
+  if (!row) return null;
+  if (typeof ensureRowRaw === 'function') ensureRowRaw(row);
+  const r = row.raw || {};
+  const toNum = (v) => {
+    const n = (typeof v === 'number') ? v : Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  const addStrict = (a, b) => {
+    const na = toNum(a), nb = toNum(b);
+    if (na == null && nb == null) return null;
+    return (na ?? 0) + (nb ?? 0);
+  };
+  const subStrict = (a, b) => {
+    const na = toNum(a), nb = toNum(b);
+    if (na == null || nb == null) return null;
+    return na - nb;
+  };
+
+  return {
+    pH: toNum(calcMetric(r, 'ph')),
+    EC: toNum(calcMetric(r, 'ec')),
+    OC: toNum(getSTV(r, 'oc')),
+    N: toNum(addStrict(getSTV(r, 'ammonium'), getSTV(r, 'nitrate'))),
+    P: toNum(getSTV(r, 'phosphorus')),
+    K: toNum(getSTV(r, 'potassium')),
+    S: toNum(getSTV(r, 'sulphur')),
+    Zn: toNum(subStrict(getSTV(r, 'zinccopper'), getSTV(r, 'copper'))),
+    Cu: toNum(getSTV(r, 'copper')),
+    Fe: toNum(getSTV(r, 'iron')),
+    Mn: toNum(getSTV(r, 'manganese')),
+    B: toNum(getSTV(r, 'boron'))
+  };
+}
+
+function buildStvDirectRowFromResults(row, testDateOverride) {
+  const metrics = getResultsMetricValues(row) || {};
+  const testDate = testDateOverride || row?.time || row?.Test_date || row?.testDate || '';
+  return {
+    ClientID: row?.clientId ?? row?.Client_ID ?? row?.ClientID ?? 'Default',
+    Farmer: row?.farmer ?? row?.Farmer ?? row?.clientId ?? row?.Client_ID ?? '',
+    Farm_ID: row?.farmId ?? row?.Farm_ID ?? '',
+    Crop: row?.crop ?? row?.Crop ?? '',
+    Test_ID: row?.tid ?? row?.Test_ID ?? '',
+    Device_ID: row?.did ?? row?.Device_ID ?? '',
+    'Test Date-time': testDate,
+    'Report Date-time': new Date().toLocaleString(),
+    pH: metrics.pH,
+    EC: metrics.EC,
+    OC: metrics.OC,
+    Avail_N: metrics.N,
+    Avail_P: metrics.P,
+    Avail_K: metrics.K,
+    Avail_S: metrics.S,
+    Zn: metrics.Zn,
+    Cu: metrics.Cu,
+    Fe: metrics.Fe,
+    Mn: metrics.Mn,
+    B: metrics.B
+  };
+}
+
+async function downloadResultsReport(evt, testId, deviceId, crop, testDate) {
   if (evt && typeof evt.stopPropagation === 'function') evt.stopPropagation();
   const button = evt && (evt.currentTarget || evt.target);
   const prevLabel = button ? button.textContent : '';
-  const reportId = buildResultsReportId(testId, deviceId, testDate);
   if (button) {
     button.disabled = true;
     button.textContent = 'Preparing...';
@@ -16170,39 +16389,32 @@ function downloadResultsReport(evt, testId, deviceId, crop, testDate) {
     resetButton();
     return;
   }
-  if (typeof google === 'undefined' || !google.script) {
-    alert('Report export is only available in the Apps Script deployment.');
+  if (!ensureResultsReportLibs()) {
     resetButton();
     return;
   }
 
-  google.script.run
-    .withSuccessHandler(function (res) {
-      resetButton();
-      if (!res || !res.success) {
-        alert(res && res.msg ? res.msg : 'Failed to generate report PDF.');
-        return;
-      }
-      if (res.downloadUrl) {
-        const link = document.createElement('a');
-        link.href = res.downloadUrl;
-        link.download = `${reportId}.pdf`;
-        link.rel = 'noopener';
-        link.target = '_blank';
-        link.click();
-        return;
-      }
-      if (res.pdfBase64) {
-        downloadPDFFromBase64(res.pdfBase64, `${reportId}.pdf`);
-      } else {
-        alert('PDF generated but no data returned from server.');
-      }
-    })
-    .withFailureHandler(function (err) {
-      resetButton();
-      alert('Error generating report: ' + (err && err.message ? err.message : err));
-    })
-    .generateNutrientPlanPDFForTest(testId, deviceId || '');
+  const row = findResultsRowForReport(testId, deviceId, testDate);
+  if (!row) {
+    alert('Unable to locate report data for this Test ID.');
+    resetButton();
+    return;
+  }
+
+  const stvRow = buildStvDirectRowFromResults(row, testDate);
+  const stamp = stvNowStamp();
+  try {
+    const dosePlan = await fetchStvDirectDosePlan(stvRow);
+    const reportData = mapSTVDirectReportRow(stvRow, dosePlan);
+    const blob = await generateStvDirectPdfBlob(reportData);
+    const fileName = buildSTVReportFileName(stvRow, stamp);
+    downloadBlobFile(fileName, blob);
+  } catch (err) {
+    console.error('Results PDF export failed:', err);
+    alert('Error generating report: ' + (err && err.message ? err.message : err));
+  } finally {
+    resetButton();
+  }
 }
 
 
@@ -23401,7 +23613,6 @@ const STV_DIRECT_TABLE_HEADERS = [
   'Test ID',
   'Device ID',
   'Test Date-time',
-  'Report Date-time',
   'pH (-)',
   'EC (dS/m)',
   'Org Carbon (%)',
@@ -23485,7 +23696,7 @@ function renderSTVDirectTable(rows) {
   if (!tbody) return;
 
   if (!rows || !rows.length) {
-    tbody.innerHTML = '<tr><td colspan="21" style="padding:20px;text-align:center;">No STV Direct records found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="20" style="padding:20px;text-align:center;">No STV Direct records found.</td></tr>';
     return;
   }
 
@@ -23506,7 +23717,6 @@ function renderSTVDirectTable(rows) {
       <td>${escapeHtml(row.Test_ID)}</td>
       <td>${escapeHtml(row.Device_ID)}</td>
       <td class="col-date">${escapeHtml(row['Test Date-time'] || row.Date)}</td>
-      <td class="col-date">${escapeHtml(row['Report Date-time'])}</td>
       <td>${escapeHtml(row.pH)}</td>
       <td>${escapeHtml(row.EC)}</td>
       <td>${escapeHtml(row.OC)}</td>
@@ -23750,7 +23960,6 @@ function formatSTVDirectRowForExport(row) {
     row.Test_ID,
     row.Device_ID,
     row['Test Date-time'] || row.Date,
-    row['Report Date-time'],
     row.pH,
     row.EC,
     row.OC,
@@ -26403,6 +26612,116 @@ STRATEGIC:
 This is the scale story. It is used to demonstrate deployment breadth, targeting efficiency, and scalability to stakeholders.`
   },
 
+  // ---------- KPI CARD HELP ----------
+  "kpi-farms": {
+    title: "Farms (Coverage)",
+    body:
+`TECHNICAL:
+Counts unique farms with any record in the current filter scope (soil tests, fertilizer usage, or yield entries).
+
+PURPOSE:
+Quickly communicates program reach and whether the dataset is sufficiently broad to be representative.`
+  },
+  "kpi-area": {
+    title: "Area (Acres)",
+    body:
+`TECHNICAL:
+Total cultivated area (acres) represented by the filtered farms. Used for normalization of cost and yield metrics.
+
+PURPOSE:
+Shows scale of impact and provides the denominator for per-acre calculations.`
+  },
+  "kpi-tests": {
+    title: "Soil Samples",
+    body:
+`TECHNICAL:
+Total number of soil tests within the filtered scope (baseline + follow-up combined).
+
+PURPOSE:
+Indicates diagnostic coverage and how robust the soil data foundation is for impact reporting.`
+  },
+  "kpi-repeat": {
+    title: "Repeat Tests",
+    body:
+`TECHNICAL:
+Percentage of farms with ≥2 tests (baseline + follow-up), enabling change analysis.
+
+PURPOSE:
+Signals how many farms can be used for defensible before/after impact comparisons.`
+  },
+  "kpi-fertilizer": {
+    title: "Fertilizer Data",
+    body:
+`TECHNICAL:
+Number of farms with fertilizer usage line items captured in the selected scope.
+
+PURPOSE:
+Measures advisory adoption and unlocks nutrient load + cost impact calculations.`
+  },
+  "kpi-yield": {
+    title: "Yield Data",
+    body:
+`TECHNICAL:
+Number of farms with yield entries in the selected scope, regardless of method.
+
+PURPOSE:
+Shows outcome coverage for yield-based impact KPIs and ROI narratives.`
+  },
+  "kpi-coverage-states": {
+    title: "States Covered",
+    body:
+`TECHNICAL:
+Count of unique states represented in the current dataset.
+
+PURPOSE:
+Communicates geographic footprint at a high level for stakeholders.`
+  },
+  "kpi-coverage-districts": {
+    title: "Districts Covered",
+    body:
+`TECHNICAL:
+Number of unique districts represented in the filtered records.
+
+PURPOSE:
+Helps identify regional concentration or gaps in deployment.`
+  },
+  "kpi-coverage-farmers": {
+    title: "Farmers (Unique)",
+    body:
+`TECHNICAL:
+Unique farmer identifiers linked to records in the current scope.
+
+PURPOSE:
+Indicates beneficiary count and adoption breadth beyond just farm units.`
+  },
+  "kpi-coverage-area": {
+    title: "Coverage Area",
+    body:
+`TECHNICAL:
+Total acres represented in the coverage rollup view.
+
+PURPOSE:
+Supports scale reporting and provides context for geographic impact.`
+  },
+  "kpi-coverage-devices": {
+    title: "Devices (Unique)",
+    body:
+`TECHNICAL:
+Unique device IDs contributing data in the selected scope.
+
+PURPOSE:
+Reflects operational scale and instrument penetration.`
+  },
+  "kpi-coverage-tests": {
+    title: "Tests (Total)",
+    body:
+`TECHNICAL:
+Total tests captured in the coverage view (all time within filters).
+
+PURPOSE:
+Indicates data volume and sampling intensity for audit readiness.`
+  },
+
   // ---------- PANEL HELP ----------
   "panel-economic": {
     title: "Economic Impact (₹)",
@@ -26638,15 +26957,6 @@ Choose a pairing rule that is stable, explainable, and defensible.`
     iaOpenInfo(info.title, info.body);
   });
 
-  // Close on overlay click
-  document.getElementById('ia-info-modal')?.addEventListener('click', (e) => {
-    if (e.target && e.target.id === 'ia-info-modal') iaCloseInfo();
-  });
-
-  // Close on ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') iaCloseInfo();
-  });
 })();
 
 function iaOpenInfo(title, body){

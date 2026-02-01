@@ -337,7 +337,6 @@ const STV_DIRECT_HEADERS = [
   'Crop',
   'Date',
   'Test Date-time',
-  'Report Date-time',
   'pH',
   'EC',
   'OC',
@@ -540,10 +539,6 @@ function srvr_ImportSTVDirectCSV(payload) {
       if (key === normalizeHeader_('Test Date-time')) {
         const idx = headerMap[normalizeHeader_('Test Date-time')] ?? headerMap[normalizeHeader_('Date')];
         return idx != null ? row[idx] : '';
-      }
-      if (key === normalizeHeader_('Report Date-time')) {
-        const idx = headerMap[normalizeHeader_('Report Date-time')];
-        return idx != null ? row[idx] : new Date().toISOString();
       }
       const idx = headerMap[key];
       return idx != null ? row[idx] : '';
